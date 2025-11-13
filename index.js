@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express');
 const mongoose = require('mongoose');
 
@@ -10,13 +12,15 @@ const cartRoutes = require('./routes/carts');
 const wishlistRoutes = require('./routes/wishlists');
 const paymentRoutes = require('./routes/payments');
 const inventoryRoutes = require('./routes/inventory');
+
+
 const port = process.env.PORT || 3001;
 const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
 
-const uri = 'mongodb+srv://testUser:12345@cluster0.emv2l0x.mongodb.net/test?appName=Cluster0';
+const uri = process.env.DB_URI;
 
 // const dbUri = 'mongodb+srv://rajeshjas20296_db_user:ayoSCKFYDpvW9JAb@cluster0.dieuovp.mongodb.net/?appName=Cluster0';
 
