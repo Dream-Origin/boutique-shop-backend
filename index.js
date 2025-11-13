@@ -22,10 +22,6 @@ app.use(morgan('dev'));
 
 const uri = process.env.DB_URI;
 
-// const dbUri = 'mongodb+srv://rajeshjas20296_db_user:ayoSCKFYDpvW9JAb@cluster0.dieuovp.mongodb.net/?appName=Cluster0';
-
-// mongodb+srv://rajeshjas20296_db_user:<db_password>@cluster0.emv2l0x.mongodb.net/?appName=Cluster0
-
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Database connection established!'))
   .catch(err => console.error('Database connection error:', err));
