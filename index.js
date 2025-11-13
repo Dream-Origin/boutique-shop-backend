@@ -1,6 +1,7 @@
 require('dotenv').config()
-
 const express = require('express');
+var cors = require('cors')
+
 const mongoose = require('mongoose');
 
 const morgan = require('morgan');
@@ -16,6 +17,7 @@ const inventoryRoutes = require('./routes/inventory');
 
 const port = process.env.PORT || 3001;
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 app.use(morgan('dev'));
