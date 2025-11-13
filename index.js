@@ -1,0 +1,49 @@
+const express = require('express');
+const mongoose = require('mongoose');
+
+const morgan = require('morgan');
+
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const productRoutes = require('./routes/products');
+const cartRoutes = require('./routes/carts');
+const wishlistRoutes = require('./routes/wishlists');
+const paymentRoutes = require('./routes/payments');
+const inventoryRoutes = require('./routes/inventory');
+const port = process.env.PORT || 3001;
+const app = express();
+
+app.use(express.json());
+app.use(morgan('dev'));
+
+const uri = 'mongodb+srv://testUser:12345@cluster0.emv2l0x.mongodb.net/test?appName=Cluster0';
+
+// const dbUri = 'mongodb+srv://rajeshjas20296_db_user:ayoSCKFYDpvW9JAb@cluster0.dieuovp.mongodb.net/?appName=Cluster0';
+
+// mongodb+srv://rajeshjas20296_db_user:<db_password>@cluster0.emv2l0x.mongodb.net/?appName=Cluster0
+
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Database connection established!'))
+  .catch(err => console.error('Database connection error:', err));
+
+// Route mounting
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/products', productRoutes);
+app.use('/carts', cartRoutes);
+app.use('/wishlists', wishlistRoutes);
+app.use('/payments', paymentRoutes);
+app.use('/inventory', inventoryRoutes);
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.statusCode || 500).json({ error: err.message || 'Server Error' });
+});
+
+module.exports = app;
+
+// And for local dev:
+if (require.main === module) {
+  app.listen(port, () => console.log(`Server running on port ${port}`));
+}
