@@ -13,10 +13,10 @@ const productSchema = new mongoose.Schema({
   unique: { type: Boolean, default: false },
   newArrival: { type: Boolean, default: false },
   price: { type: Number, required: true },
+  originalPrice: { type: Number, required: true },
   discountPercentage: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
   stock: { type: Number, default: 0 },
-  brand: String,
   sizes: [String],
   colors: [String],
   material: String,
@@ -27,7 +27,11 @@ const productSchema = new mongoose.Schema({
   },
   images: [String],
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  description: String,
+  fabric: String,
+  tags: [String],
+  details: String,
 });
 
 module.exports = mongoose.model('Products', productSchema);

@@ -1,9 +1,8 @@
 require('dotenv').config()
 const express = require('express');
-var cors = require('cors')
+var cors = require('cors');
 
 const mongoose = require('mongoose');
-
 const morgan = require('morgan');
 
 const authRoutes = require('./routes/auth');
@@ -13,11 +12,14 @@ const cartRoutes = require('./routes/carts');
 const wishlistRoutes = require('./routes/wishlists');
 const paymentRoutes = require('./routes/payments');
 const inventoryRoutes = require('./routes/inventory');
+const assetManagementRoutes = require('./routes/assetManagement');
 
 
 const port = process.env.PORT || 3001;
 const app = express();
 app.use(cors());
+
+
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -36,6 +38,7 @@ app.use('/carts', cartRoutes);
 app.use('/wishlists', wishlistRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/inventory', inventoryRoutes);
+app.use('/upload', assetManagementRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
