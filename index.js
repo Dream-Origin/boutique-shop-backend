@@ -16,7 +16,7 @@ const inventoryRoutes = require('./routes/inventory');
 const fileUploadRoute = require("./routes/fileUpload");
 
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
 
@@ -45,9 +45,5 @@ app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({ error: err.message || 'Server Error' });
 });
 
-module.exports = app;
 
-// And for local dev:
-if (require.main === module) {
-  app.listen(port, () => console.log(`Server running on port ${port}`));
-}
+app.listen(port, () => console.log(`Server running on port ${port}`));
