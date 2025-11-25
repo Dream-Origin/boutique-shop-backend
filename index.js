@@ -14,6 +14,7 @@ const wishlistRoutes = require('./routes/wishlists');
 const paymentRoutes = require('./routes/payments');
 const inventoryRoutes = require('./routes/inventory');
 const fileUploadRoute = require("./routes/fileUpload");
+const ordersRoute = require("./routes/orders")
 
 
 const port = process.env.PORT || 3000;
@@ -38,6 +39,7 @@ app.use('/wishlists', wishlistRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use("/", fileUploadRoute);
+app.use("/orders", ordersRoute);
 
 // Global error handler
 app.use((err, req, res, next) => {
