@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema({
   discountPercentage: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
   stock: { type: Number, default: 0 },
+  size: { type: String, required: false },
   sizes: [String],
   colors: [String],
   material: String,
