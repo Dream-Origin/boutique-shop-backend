@@ -15,6 +15,7 @@ const paymentRoutes = require('./routes/payments');
 const inventoryRoutes = require('./routes/inventory');
 const fileUploadRoute = require("./routes/fileUpload");
 const ordersRoute = require("./routes/orders")
+const googleReviewsRoute = require("./routes/googleReviews");
 
 
 const port = process.env.PORT || 3000;
@@ -40,6 +41,7 @@ app.use('/payments', paymentRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use("/", fileUploadRoute);
 app.use("/orders", ordersRoute);
+app.use("/", googleReviewsRoute);
 
 // Global error handler
 app.use((err, req, res, next) => {

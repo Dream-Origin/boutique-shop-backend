@@ -121,42 +121,83 @@ router.get("/filter/status/:status", async (req, res, next) => {
 /* =====================================================
    UPDATE ORDER STATUS & OPTIONAL PAYMENT INFO
 ===================================================== */
-router.put(
-  "/:id/status",
-  validate([
-    param("id").isMongoId(),
-    body("status").notEmpty(),
-  ]),
-  async (req, res, next) => {
-    try {
-      const { status, paymentId } = req.body;
+router.put("/:id/status", async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-      // Build update object
-      const updateFields = { status };
+  try {
+    const { status, paymentId } = req.body;
 
-      if (paymentId) {
-        updateFields.payment = {
-          ...updateFields.payment,
-          method: "Razorpay",
-          paymentId,
-          status, // optional: keep payment.status in sync with order status
-        };
-      }
+    // 1️⃣ Fetch order
+    const order = await Order.findById(req.params.id).session(session);
 
-      const order = await Order.findByIdAndUpdate(
-        req.params.id,
-        updateFields,
-        { new: true }
+    if (!order) {
+      await session.abortTransaction();
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // 2️⃣ CASE A: paymentId NOT present → only status update
+    if (!paymentId) {
+      order.status = status;
+      await order.save({ session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.json({ success: true, order });
+    }
+
+    // 3️⃣ CASE B: paymentId present → payment success flow
+
+    // Prevent double stock reduction
+    if (order.payment?.paymentId) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        error: "Payment already processed"
+      });
+    }
+
+    // Update order + payment
+    order.status = status || "Confirmed";
+    order.payment = {
+      method: "Razorpay",
+      status: "Paid",
+      paymentId
+    };
+
+    await order.save({ session });
+
+    // Reduce stock for each item
+    for (const item of order.items) {
+      const updatedProduct = await Product.findOneAndUpdate(
+        {
+          productId: item.productId,
+          stock: { $gte: item.quantity }
+        },
+        {
+          $inc: { stock: -item.quantity }
+        },
+        { session }
       );
 
-      if (!order) return res.status(404).json({ error: "Order not found" });
-
-      res.json(order);
-    } catch (err) {
-      next(err);
+      if (!updatedProduct) {
+        throw new Error(`Insufficient stock for ${item.productId}`);
+      }
     }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.json({ success: true, order });
+
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    next(err);
   }
-);
+});
+
+
 
 
 /* =====================================================
