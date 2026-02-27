@@ -64,9 +64,29 @@ router.put('/:id',
   }
 );
 
-router.delete('/:id', 
+router.delete('/bulk',
   // authMiddleware, adminMiddleware,
-   async (req, res, next) => {
+  validate([
+    body('ids').isArray({ min: 1 }).withMessage('ids must be a non-empty array'),
+    body('ids.*').isMongoId().withMessage('Each id must be a valid MongoDB ID')
+  ]),
+  async (req, res, next) => {
+    try {
+      const { ids } = req.body;
+      const result = await Product.deleteMany({ _id: { $in: ids } });
+      res.json({
+        message: 'Bulk delete completed',
+        deletedCount: result.deletedCount
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.delete('/:id',
+  // authMiddleware, adminMiddleware,
+  async (req, res, next) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
