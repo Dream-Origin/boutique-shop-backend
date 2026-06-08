@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { body, param, validationResult } = require("express-validator");
 const Order = require("../models/order");
 const Product = require("../models/product");
+const Counter = require("../models/counter");
 
 const router = express.Router();
 
@@ -24,6 +25,17 @@ function generateOrderId() {
   return "ORD-" + Date.now() + "-" + Math.floor(Math.random() * 9999);
 }
 
+async function generateOrderNumber() {
+  const counter = await Counter.findOneAndUpdate(
+    { _id: "order" },
+    { $inc: { sequence: 1 } },
+    { new: true, upsert: true }
+  );
+
+  const date = new Date().toISOString().split("T")[0];
+
+  return `ORD-${date}-${String(counter.sequence).padStart(6, "0")}`;
+}
 /* =====================================================
    CREATE ORDER
 ===================================================== */
@@ -38,7 +50,7 @@ router.post(
     try {
       const order = new Order({
         ...req.body,
-        orderId: generateOrderId(),
+        orderId: await generateOrderNumber(),
       });
 
       await order.save();
