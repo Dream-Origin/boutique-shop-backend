@@ -58,7 +58,7 @@ router.post('/login', [
     const payload = { userId: user._id, roles: user.roles };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ token });
+    res.json({ token, roles: payload?.roles });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
